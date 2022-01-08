@@ -6,7 +6,7 @@ local fs  = require "nixio.fs"
 local sys = require "luci.sys"
 local m, s, p
 
-local service_running = (luci.sys.call("pidof alpine-fan-controller > /dev/null"))==0
+local service_running = (luci.sys.call("pgrep -f \"/alpine-fan-controller\" > /dev/null"))==0
 
 local state_msg = " "
 
