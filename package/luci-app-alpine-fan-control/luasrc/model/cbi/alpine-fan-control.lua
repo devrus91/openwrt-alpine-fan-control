@@ -68,7 +68,7 @@ max_temp = s:option(Value, "max_temp", translate("max_temp"), translate("Tempera
     max_temp.rmempty = "false"
     max_temp.optional = "false"
 
-max_speed = s:option(Value, "max_speed", translate("max_speed"), translate("Fan speed at minimum fan state - can be set to 0"))
+max_speed = s:option(Value, "max_speed", translate("max_speed"), translate("Fan speed at maximum fan state (default: 2500)"))
     max_speed.datatype = "uinteger"
     max_speed.default="2500"
     max_speed.rmempty="false"
