@@ -1,5 +1,5 @@
 # openwrt-alpine-fan-control
-Control the fans on the Netgear R9000 and XR700.
+Control the fans on the Xiaomi R3D.
 
 ## Usage
 
@@ -17,7 +17,7 @@ This package depends on ``bash``, due to the use of arrays. PRs to remove the de
 To build alpine-fan-control for OpenWrt, first add this feed to your ``feeds.conf`` in a fully set-up OpenWrt SDK [(read here on how to setup the OpenWrt SDK)](https://openwrt.org/docs/guide-developer/using_the_sdk):
 
 ```
-echo "src-git alpinefancontrol https://github.com/hurrian/openwrt-alpine-fan-control.git" >> feeds.conf
+echo "src-git alpinefancontrol https://github.com/openwrt-xiaomi/openwrt-alpine-fan-control.git" >> feeds.conf
 
 $ ./scripts/feeds update -a
 $ ./scripts/feeds install -a

@@ -17,7 +17,7 @@ else
 end
 
 m = Map("alpine-fan-control", translate("Fan Control"),
-	translatef("Control the fan on your Netgear R9000/XR700.") .. "<br />" .. translate("Service status: ") .. state_msg)
+	translatef("Control the fan on your Xiaomi R3D.") .. "<br />" .. translate("Service status: ") .. state_msg)
 
 s = m:section(TypedSection, "alpine-fan-control", translate("Settings"))
 s.addremove = false

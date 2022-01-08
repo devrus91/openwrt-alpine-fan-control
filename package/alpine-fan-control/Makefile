@@ -22,7 +22,7 @@ define Package/alpine-fan-control
 	SECTION:=utils
 	CATEGORY:=Utilities
 	DEPENDS:=bash
-	TITLE:=Fan control daemon for Annapurna Alpine devices (Netgear R9000, XR700)
+	TITLE:=Fan control daemon for Xiaomi R3D
 	PKGARCH:=all
 endef
 
@@ -31,7 +31,7 @@ define Package/alpine-fan-control/conffiles
 endef
 
 define Package/alpine-fan-control/description
-  Fan control daemon for Annapurna Alpine devices (Netgear R9000, XR700)
+  Fan control daemon for Xiaomi R3D
 endef
 
 define Build/Prepare
