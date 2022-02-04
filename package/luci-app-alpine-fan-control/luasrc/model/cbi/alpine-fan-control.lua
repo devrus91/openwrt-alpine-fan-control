@@ -40,25 +40,25 @@ d.rmempty  = false
 
 min_temp = s:option(Value, "min_temp", translate("min_temp"), translate("Temperature for minimum fan state (Celsius)"))
     min_temp.datatype = "uinteger"
-    min_temp.default = "36"
+    min_temp.default = "40"
     min_temp.rmempty = "false"
     min_temp.optional = "false"
 
 min_speed = s:option(Value, "min_speed", translate("min_speed"), translate("Fan speed at minimum fan state"))
     min_speed.datatype = "uinteger"
-    min_speed.default = "785"
+    min_speed.default = "1500"
     min_speed.rmempty = "false"
     min_speed.optional = "false"
 
 mid_temp = s:option(Value, "mid_temp", translate("mid_temp"), translate("Temperature for medium fan state (Celsius)"))
     mid_temp.datatype = "uinteger"
-    mid_temp.default = "41"
+    mid_temp.default = "45"
     mid_temp.rmempty = "false"
     mid_temp.optional = "false"
 
 mid_speed = s:option(Value, "mid_speed", translate("mid_speed"), translate("Fan speed at medium fan state"))
     mid_speed.datatype = "uinteger"
-    mid_speed.default = "2400"
+    mid_speed.default = "2000"
     mid_speed.rmempty = "false"
     mid_speed.optional = "false"
 

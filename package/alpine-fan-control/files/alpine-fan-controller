@@ -13,6 +13,7 @@ DEBUG=$8
 
 DRV_SPEED_MIN=0
 DRV_SPEED_MAX=255
+CFG_SPEED_MAX=2500
 
 LOGPREFIX="alpine-fan-controller"
 HYSTERESIS=0
@@ -45,13 +46,13 @@ function log_debug {
 
 function get_speed {
 	local speed=$(cat $FILE_SPEED)
-	speed=$(( $SPEED_MAX * $speed / $DRV_SPEED_MAX ))
+	speed=$(( $CFG_SPEED_MAX * $speed / $DRV_SPEED_MAX ))
 	echo $speed
 }
 
 function internal_set_speed {
 	local speed=$1
-	local value=$(( $DRV_SPEED_MAX * $speed / $SPEED_MAX ))
+	local value=$(( $DRV_SPEED_MAX * $speed / $CFG_SPEED_MAX ))
 	[ $value -lt $DRV_SPEED_MIN ] && value=$DRV_SPEED_MIN
 	[ $value -gt $DRV_SPEED_MAX ] && value=$DRV_SPEED_MAX
 	echo $value > $FILE_SPEED
