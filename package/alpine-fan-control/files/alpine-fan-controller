@@ -26,11 +26,11 @@ if [ $UID -ne 0 ]; then
 fi
 
 # hwmon paths, hardcoded for Xiaomi R3D, adjust as needed
-FILE_SPEED=$( grep -l emc2301 /sys/class/hwmon/hwmon*/name )
-[ -f "$FILE_SPEED" ] || { logger "$LOGPREFIX: fan controller EMC2301 not found" ; exit 1; }
+FILE_SPEED=$( grep -l emc230 /sys/class/hwmon/hwmon*/name )
+[ -f "$FILE_SPEED" ] || { logger "$LOGPREFIX: fan controller EMC230x not found" ; exit 1; }
 FILE_SPEED=$( dirname "$FILE_SPEED" 2>/dev/null )
 FILE_SPEED=$FILE_SPEED/pwm1
-[ -f "$FILE_SPEED" ] || { logger "$LOGPREFIX: Fan controller EMC2301 not found" ; exit 1; }
+[ -f "$FILE_SPEED" ] || { logger "$LOGPREFIX: Fan controller EMC230x not found" ; exit 1; }
 
 FILE_TEMP=$( grep -l tmp75 /sys/class/hwmon/hwmon*/name )
 [ -f "$FILE_TEMP" ] || { logger "$LOGPREFIX: thermal sensor TMP75 not found" ; exit 1; }
