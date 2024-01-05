@@ -75,10 +75,22 @@ max_speed.default = "100"
 max_speed.rmempty = false
 max_speed.optional = false
 
-interval = s:option(Value, "interval", translate("interval"), translate("Interval for hysteresis adjustment"))
+interval = s:option(Value, "interval", translate("interval"), translate("Interval for hysteresis adjustment (seconds)"))
 interval.datatype = "uinteger"
 interval.default = "5"
 interval.rmempty = false
 interval.optional = false
+
+tmp_sens = s:option(Value, "tmp_sens", translate("tmp_sens"), translate("Temperature sensor name (default: tmp75)"))
+tmp_sens.datatype = "string"
+tmp_sens.default = "tmp75"
+tmp_sens.rmempty = false
+tmp_sens.optional = false
+
+fan_cont = s:option(Value, "fan_cont", translate("fan_cont"), translate("Fan controller name (default: emc230)"))
+fan_cont.datatype = "string"
+fan_cont.default = "emc230"
+fan_cont.rmempty = false
+fan_cont.optional = false
 
 return m

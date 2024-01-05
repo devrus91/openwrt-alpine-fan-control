@@ -9,6 +9,10 @@ if [ -z "$fan_control" ]; then
 	uci set alpine-fan-control.@alpine-fan-control[0].max_temp="50"
 	uci set alpine-fan-control.@alpine-fan-control[0].max_speed="100"
 	uci set alpine-fan-control.@alpine-fan-control[0].interval="5"
+	uci set alpine-fan-control.@alpine-fan-control[0].tmp_sens="tmp75"
+	uci set alpine-fan-control.@alpine-fan-control[0].fan_cont="emc230"
+	uci set alpine-fan-control.@alpine-fan-control[0].drv_speed_min="0"
+	uci set alpine-fan-control.@alpine-fan-control[0].drv_speed_max="255"
 
 	uci commit alpine-fan-control
 fi

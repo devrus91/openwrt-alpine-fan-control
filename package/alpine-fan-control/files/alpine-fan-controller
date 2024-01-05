@@ -23,11 +23,14 @@ SPEED_MED=$( get_opt med_speed 80 )
 TEMP_MAX=$(  get_opt max_temp  50 )
 SPEED_MAX=$( get_opt max_speed 100 )
 
+TEMP_SENSOR=$( get_opt tmp_sens tmp75  )
+FAN_CONT=$(    get_opt fan_cont emc230 )
+
 SLEEP_INTERVAL=$( get_opt interval 5 )
 DEBUG=$( get_opt debug 0 )
 
-DRV_SPEED_MIN=0
-DRV_SPEED_MAX=255
+DRV_SPEED_MIN=$( get_opt drv_speed_min 0 )
+DRV_SPEED_MAX=$( get_opt drv_speed_max 255 )
 CFG_SPEED_MAX=100
 
 LOGPREFIX="alpine-fan-controller"
@@ -61,24 +64,24 @@ OPTLIST="$OPTLIST [$TEMP_MIN $SPEED_MIN]"
 OPTLIST="$OPTLIST [$TEMP_MED $SPEED_MED]"
 OPTLIST="$OPTLIST [$TEMP_MAX $SPEED_MAX]"
 OPTLIST="$OPTLIST $SLEEP_INTERVAL $DEBUG"
+OPTLIST="$OPTLIST $TEMP_SENSOR $FAN_CONT"
 
 # Perform conversion to millidegrees Celsius
 TEMP_MIN=$(( $TEMP_MIN * 1000 ))
 TEMP_MED=$(( $TEMP_MED * 1000 ))
 TEMP_MAX=$(( $TEMP_MAX * 1000 ))
 
-# hwmon paths, hardcoded for Xiaomi R3D, adjust as needed
-FILE_SPEED=$( grep -l emc230 /sys/class/hwmon/hwmon*/name )
-[ -f "$FILE_SPEED" ] || { log_error "fan controller EMC230x not found" ; exit 1; }
+FILE_SPEED=$( grep -l -F $FAN_CONT /sys/class/hwmon/hwmon*/name 2>/dev/null )
+[ -f "$FILE_SPEED" ] || { log_error "fan controller $FAN_CONT not found" ; exit 1; }
 FILE_SPEED=$( dirname "$FILE_SPEED" 2>/dev/null )
 FILE_SPEED=$FILE_SPEED/pwm1
-[ -f "$FILE_SPEED" ] || { log_error "Fan controller EMC230x not found" ; exit 1; }
+[ -f "$FILE_SPEED" ] || { log_error "Fan controller $FAN_CONT not found" ; exit 1; }
 
-FILE_TEMP=$( grep -l tmp75 /sys/class/hwmon/hwmon*/name )
-[ -f "$FILE_TEMP" ] || { log_error "thermal sensor TMP75 not found" ; exit 1; }
+FILE_TEMP=$( grep -l -F $TEMP_SENSOR /sys/class/hwmon/hwmon*/name 2>/dev/null )
+[ -f "$FILE_TEMP" ] || { log_error "thermal sensor $TEMP_SENSOR not found" ; exit 1; }
 FILE_TEMP=$( dirname "$FILE_TEMP" 2>/dev/null )
 FILE_TEMP=$FILE_TEMP/temp1_input
-[ -f "$FILE_TEMP" ] || { log_error "Thermal sensor TMP75 not found" ; exit 1; }
+[ -f "$FILE_TEMP" ] || { log_error "Thermal sensor $TEMP_SENSOR not found" ; exit 1; }
 
 function get_speed {
 	local speed=$(cat $FILE_SPEED)
