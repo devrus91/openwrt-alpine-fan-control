@@ -1,15 +1,29 @@
 #!/bin/sh
 
+. /lib/functions.sh
+
+CFGNAME=alpine-fan-control
+
+function get_opt() {
+	local opt_name=$1
+	local config="@$CFGNAME[0]"
+	echo "$( uci_get $CFGNAME "$config" $opt_name )"
+}
+
 # set temps (in degrees C) and corresponding fan speeds 
 # in ascending order and with the same amount of values
-TEMP_MIN=$1
-SPEED_MIN=$2
-TEMP_MID=$3
-SPEED_MID=$4
-TEMP_MAX=$5
-SPEED_MAX=$6
-SLEEP_INTERVAL=$7
-DEBUG=$8
+
+TEMP_MIN=$(  get_opt min_temp  )
+SPEED_MIN=$( get_opt min_speed )
+
+TEMP_MED=$(  get_opt med_temp  )
+SPEED_MED=$( get_opt med_speed )
+
+TEMP_MAX=$(  get_opt max_temp  )
+SPEED_MAX=$( get_opt max_speed )
+
+SLEEP_INTERVAL=$( get_opt interval )
+DEBUG=$( get_opt debug )
 
 DRV_SPEED_MIN=0
 DRV_SPEED_MAX=255
@@ -20,20 +34,37 @@ HYSTERESIS=0
 TEMP_AT_LAST_SPEED_CHANGE=0
 
 function log_error {
-	logger "$LOGPREFIX: $1"
+	logger "$LOGPREFIX: ERROR: $1"
 }
 
 function log_debug {
-	if [ $DEBUG -gt 0 ]; then
+	if [ "$DEBUG" = "1" ]; then
 		logger "$LOGPREFIX: $1"
 	fi
 }
 
+if [ -z "$TEMP_MED" ]; then
+	log_error "Cannot read option 'med_temp' form config!"
+	exit 1
+fi
+
 # checking for privileges
 if [ $UID -ne 0 ]; then
+	log_error "Writing to sysfs requires privileges, relaunch as root!"
 	echo "Writing to sysfs requires privileges, relaunch as root"
 	exit 1
 fi
+
+OPTLIST=""
+OPTLIST="$OPTLIST [$TEMP_MIN $SPEED_MIN]"
+OPTLIST="$OPTLIST [$TEMP_MED $SPEED_MED]"
+OPTLIST="$OPTLIST [$TEMP_MAX $SPEED_MAX]"
+OPTLIST="$OPTLIST $SLEEP_INTERVAL $DEBUG"
+
+# Perform conversion to millidegrees Celsius
+TEMP_MIN=$(( $TEMP_MIN * 1000 ))
+TEMP_MED=$(( $TEMP_MED * 1000 ))
+TEMP_MAX=$(( $TEMP_MAX * 1000 ))
 
 # hwmon paths, hardcoded for Xiaomi R3D, adjust as needed
 FILE_SPEED=$( grep -l emc230 /sys/class/hwmon/hwmon*/name )
@@ -112,11 +143,11 @@ function interpolate_speed {
 		return
 	fi
 	if [ $TEMP -le $TEMP_MAX ]; then
-		set_speed_adv $TEMP_MID $SPEED_MID $TEMP_MAX $SPEED_MAX $TEMP
+		set_speed_adv $TEMP_MED $SPEED_MED $TEMP_MAX $SPEED_MAX $TEMP
 		return
 	fi
-	if [ $TEMP -le $TEMP_MID ]; then
-		set_speed_adv $TEMP_MIN $SPEED_MIN $TEMP_MID $SPEED_MID $TEMP
+	if [ $TEMP -le $TEMP_MED ]; then
+		set_speed_adv $TEMP_MIN $SPEED_MIN $TEMP_MED $SPEED_MED $TEMP
 		return
 	fi
 }
@@ -137,5 +168,6 @@ function run_daemon {
 	done
 }
 
+logger "$LOGPREFIX: run daemon:" $OPTLIST
 # finally start the loop
 run_daemon
