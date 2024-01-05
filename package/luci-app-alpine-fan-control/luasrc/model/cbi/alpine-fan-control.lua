@@ -81,6 +81,12 @@ interval.default = "5"
 interval.rmempty = false
 interval.optional = false
 
+temp_hyst = s:option(Value, "temp_hyst", translate("temp_hyst"), translate("Hysteresis value (Celsius)"))
+temp_hyst.datatype = "integer"
+temp_hyst.default = "0"
+temp_hyst.rmempty = false
+temp_hyst.optional = false
+
 tmp_sens = s:option(Value, "tmp_sens", translate("tmp_sens"), translate("Temperature sensor name (default: tmp75)"))
 tmp_sens.datatype = "string"
 tmp_sens.default = "tmp75"

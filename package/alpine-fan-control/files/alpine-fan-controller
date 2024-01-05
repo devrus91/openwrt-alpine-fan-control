@@ -26,6 +26,7 @@ SPEED_MAX=$( get_opt max_speed 100 )
 TEMP_SENSOR=$( get_opt tmp_sens tmp75  )
 FAN_CONT=$(    get_opt fan_cont emc230 )
 
+HYSTERESIS=$( get_opt temp_hyst 0 )
 SLEEP_INTERVAL=$( get_opt interval 5 )
 DEBUG=$( get_opt debug 0 )
 
@@ -34,7 +35,6 @@ DRV_SPEED_MAX=$( get_opt drv_speed_max 255 )
 CFG_SPEED_MAX=100
 
 LOGPREFIX="alpine-fan-controller"
-HYSTERESIS=0
 TEMP_AT_LAST_SPEED_CHANGE=0
 
 function log_error {
@@ -63,7 +63,7 @@ OPTLIST=""
 OPTLIST="$OPTLIST [$TEMP_MIN $SPEED_MIN]"
 OPTLIST="$OPTLIST [$TEMP_MED $SPEED_MED]"
 OPTLIST="$OPTLIST [$TEMP_MAX $SPEED_MAX]"
-OPTLIST="$OPTLIST $SLEEP_INTERVAL $DEBUG"
+OPTLIST="$OPTLIST $HYSTERESIS $SLEEP_INTERVAL $DEBUG"
 OPTLIST="$OPTLIST $TEMP_SENSOR $FAN_CONT"
 
 # Perform conversion to millidegrees Celsius
@@ -100,15 +100,15 @@ function internal_set_speed {
 function set_speed {
 	local NEW_SPEED=$1
 	local CUR_SPEED=$( get_speed )
-	local TEMP=$(cat $FILE_TEMP)
+	local TEMP tmp
 
+	[ "$CUR_SPEED" = "$NEW_SPEED" ] && return
 	log_debug "current speed: $CUR_SPEED, requested to set speed to $NEW_SPEED"
-	
-	local tmp=$TEMP_AT_LAST_SPEED_CHANGE
-	if [ -z "$tmp" ] || [ "$TEMP" -gt "$tmp" ] || [ $(( $TEMP + HYSTERESIS )) -le "$tmp" ]; then
-		log_debug "current temp: $TEMP"
-		echo "temp at last change was $TEMP_AT_LAST_SPEED_CHANGE"
-		echo "changing speed to $NEW_SPEED"
+
+	TEMP=$(cat $FILE_TEMP)
+	tmp=$TEMP_AT_LAST_SPEED_CHANGE
+	if [ -z "$tmp" ] || [ "$TEMP" -gt "$tmp" ] || [ $(( TEMP + HYSTERESIS )) -le "$tmp" ]; then
+		log_debug "current temp: $TEMP, temp at last change was $TEMP_AT_LAST_SPEED_CHANGE, changing speed to $NEW_SPEED"
 		internal_set_speed $NEW_SPEED
 		TEMP_AT_LAST_SPEED_CHANGE=$TEMP
 	else
@@ -130,11 +130,15 @@ function set_speed_adv {
 	set_speed "$SPEED"
 }
 
+TEMP_PREV=
+
 function interpolate_speed {
-	local i=0
 	local TEMP=$(cat $FILE_TEMP)
 
-	log_debug "current temp: $TEMP"
+	if [ "$TEMP" != "$TEMP_PREV" ]; then
+		log_debug "current temp: $TEMP"
+		TEMP_PREV=$TEMP
+	fi
 
 	if [ $TEMP -le $TEMP_MIN ]; then
 		# below first point in list, set to min speed
