@@ -6,24 +6,25 @@ CFGNAME=alpine-fan-control
 
 function get_opt() {
 	local opt_name=$1
+	local def_value=$2
 	local config="@$CFGNAME[0]"
-	echo "$( uci_get $CFGNAME "$config" $opt_name )"
+	echo "$( uci_get $CFGNAME "$config" $opt_name $def_value )"
 }
 
 # set temps (in degrees C) and corresponding fan speeds 
 # in ascending order and with the same amount of values
 
-TEMP_MIN=$(  get_opt min_temp  )
-SPEED_MIN=$( get_opt min_speed )
+TEMP_MIN=$(  get_opt min_temp  40 )
+SPEED_MIN=$( get_opt min_speed 60 )
 
-TEMP_MED=$(  get_opt med_temp  )
-SPEED_MED=$( get_opt med_speed )
+TEMP_MED=$(  get_opt med_temp  45 )
+SPEED_MED=$( get_opt med_speed 80 )
 
-TEMP_MAX=$(  get_opt max_temp  )
-SPEED_MAX=$( get_opt max_speed )
+TEMP_MAX=$(  get_opt max_temp  50 )
+SPEED_MAX=$( get_opt max_speed 100 )
 
-SLEEP_INTERVAL=$( get_opt interval )
-DEBUG=$( get_opt debug )
+SLEEP_INTERVAL=$( get_opt interval 5 )
+DEBUG=$( get_opt debug 0 )
 
 DRV_SPEED_MIN=0
 DRV_SPEED_MAX=255
