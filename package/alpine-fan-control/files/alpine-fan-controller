@@ -13,7 +13,7 @@ DEBUG=$8
 
 DRV_SPEED_MIN=0
 DRV_SPEED_MAX=255
-CFG_SPEED_MAX=2500
+CFG_SPEED_MAX=100
 
 LOGPREFIX="alpine-fan-controller"
 HYSTERESIS=0
@@ -123,7 +123,7 @@ function interpolate_speed {
 
 function reset_on_exit {
 	echo "exiting, going to max fan speed for safety..."
-	internal_set_speed 999999
+	internal_set_speed 100
 	exit 0
 }
 

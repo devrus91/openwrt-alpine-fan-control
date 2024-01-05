@@ -45,9 +45,9 @@ min_temp.default = "40"
 min_temp.rmempty = false
 min_temp.optional = false
 
-min_speed = s:option(Value, "min_speed", translate("min_speed"), translate("Fan speed at minimum fan state"))
+min_speed = s:option(Value, "min_speed", translate("min_speed"), translate("Fan speed at minimum fan state (Percents)"))
 min_speed.datatype = "uinteger"
-min_speed.default = "1500"
+min_speed.default = "60"
 min_speed.rmempty = false
 min_speed.optional = false
 
@@ -57,9 +57,9 @@ med_temp.default = "45"
 med_temp.rmempty = false
 med_temp.optional = false
 
-med_speed = s:option(Value, "med_speed", translate("med_speed"), translate("Fan speed at medium fan state"))
+med_speed = s:option(Value, "med_speed", translate("med_speed"), translate("Fan speed at medium fan state (Percents)"))
 med_speed.datatype = "uinteger"
-med_speed.default = "2000"
+med_speed.default = "80"
 med_speed.rmempty = false
 med_speed.optional = false
 
@@ -69,9 +69,9 @@ max_temp.default = "50"
 max_temp.rmempty = false
 max_temp.optional = false
 
-max_speed = s:option(Value, "max_speed", translate("max_speed"), translate("Fan speed at maximum fan state (default: 2500)"))
+max_speed = s:option(Value, "max_speed", translate("max_speed"), translate("Fan speed at maximum fan state (default: 100%)"))
 max_speed.datatype = "uinteger"
-max_speed.default = "2500"
+max_speed.default = "100"
 max_speed.rmempty = false
 max_speed.optional = false
 
