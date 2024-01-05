@@ -31,7 +31,6 @@ function e.write(self, section, value)
     else
         luci.sys.call("/etc/init.d/alpine-fan-control stop >/dev/null")
     end
-    luci.http.write("<script>location.href='./alpine-fan-control';</script>")
     return Flag.write(self, section, value)
 end
 
