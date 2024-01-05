@@ -12,8 +12,8 @@ run_alpine_fan_control()
 	local enable
 	local min_temp
 	local min_speed
-	local mid_temp
-	local mid_speed
+	local med_temp
+	local med_speed
 	local max_temp
 	local max_speed
 	local interval
@@ -26,19 +26,22 @@ run_alpine_fan_control()
 	fi
 	config_get min_temp  $1 min_temp
 	config_get min_speed $1 min_speed
-	config_get mid_temp  $1 mid_temp
-	config_get mid_speed $1 mid_speed
+	config_get med_temp  $1 med_temp
+	config_get med_speed $1 med_speed
 	config_get max_temp  $1 max_temp
 	config_get max_speed $1 max_speed
 	config_get interval  $1 interval
 	config_get debug     $1 debug
 
+	[ -z "$med_temp"  ] && config_get med_temp  $1 mid_temp
+	[ -z "$med_speed" ] && config_get med_speed $1 mid_speed
+
 	# Perform conversion to millidegrees Celsius
 	min_temp=$(( $min_temp * 1000 ))
-	mid_temp=$(( $mid_temp * 1000 ))
+	med_temp=$(( $med_temp * 1000 ))
 	max_temp=$(( $max_temp * 1000 ))
 
-	CONFIG="$min_temp $min_speed $mid_temp $mid_speed $max_temp $max_speed $interval $debug"
+	CONFIG="$min_temp $min_speed $med_temp $med_speed $max_temp $max_speed $interval $debug"
 }
 
 start_service()
