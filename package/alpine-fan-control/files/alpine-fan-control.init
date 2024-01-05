@@ -3,51 +3,60 @@
 START=99
 SERVICE=alpine-fan-control
 
+PROG="alpine-fan-controller"
 USE_PROCD=1
+CONFIG=""
 
 run_alpine_fan_control()
 {
+	local enable
+	local min_temp
+	local min_speed
+	local mid_temp
+	local mid_speed
+	local max_temp
+	local max_speed
+	local interval
+	local debug
+
 	config_get_bool enable $1 enable
-	if [ "$enable" -gt 0 ]; then
-		local min_temp
-		local min_speed
-		local mid_temp
-		local mid_speed
-		local max_temp
-		local max_speed
-		local interval
-		local debug
-		config_get min_temp  $1 min_temp
-		config_get min_speed $1 min_speed
-		config_get mid_temp  $1 mid_temp
-		config_get mid_speed $1 mid_speed
-		config_get max_temp  $1 max_temp
-		config_get max_speed $1 max_speed
-		config_get interval  $1 interval
-		config_get debug     $1 debug
-
-		# Perform conversion to millidegrees Celsius
-		min_temp=$(( $min_temp * 1000 ))
-		mid_temp=$(( $mid_temp * 1000 ))
-		max_temp=$(( $max_temp * 1000 ))
-
-		PROG="alpine-fan-controller $min_temp $min_speed $mid_temp $mid_speed $max_temp $max_speed $interval $debug"
-		logger "alpine-fan-control started."
-	else
+	if [ "$enable" != "1" ]; then
 		logger "alpine-fan-control is disabled. check configuration?"
+		return
 	fi
+	config_get min_temp  $1 min_temp
+	config_get min_speed $1 min_speed
+	config_get mid_temp  $1 mid_temp
+	config_get mid_speed $1 mid_speed
+	config_get max_temp  $1 max_temp
+	config_get max_speed $1 max_speed
+	config_get interval  $1 interval
+	config_get debug     $1 debug
+
+	# Perform conversion to millidegrees Celsius
+	min_temp=$(( $min_temp * 1000 ))
+	mid_temp=$(( $mid_temp * 1000 ))
+	max_temp=$(( $max_temp * 1000 ))
+
+	CONFIG="$min_temp $min_speed $mid_temp $mid_speed $max_temp $max_speed $interval $debug"
 }
 
 start_service()
 {
+	CONFIG=""
 	config_load alpine-fan-control
 	config_foreach run_alpine_fan_control alpine-fan-control
+	if [ -z "$CONFIG" ]; then
+		#logger "alpine-fan-control config is empty."
+		return 0
+	fi
+	logger $PROG "start..."
 
 	procd_open_instance
-	procd_set_param command $PROG
+	procd_set_param command $PROG $CONFIG
 	procd_close_instance
 
-	logger $PROG
+	logger $PROG $CONFIG
 }
 
 stop_service()
@@ -55,7 +64,6 @@ stop_service()
 	ps -w | grep alpine-fan-controller | grep -v grep | awk -F ' ' '{print $1}' | xargs kill -9 2>/dev/null
 	logger "alpine-fan-controller stopped."
 }
-
 
 reload_service()
 {

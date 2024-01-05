@@ -1,7 +1,14 @@
 {
-  "luci-app-alpine-fan-control": {
-    "description": "Grant UCI access for luci-app-alpine-fan-control",
-    "read": { "uci": ["alpine-fan-control"] },
-    "write": { "uci": ["alpine-fan-control"] }
-  }
+    "luci-app-alpine-fan-control": {
+        "description": "Grant UCI access for luci-app-alpine-fan-control",
+        "read": {
+            "file": {
+                "/usr/bin/alpine-fan-controller": [ "exec" ]
+            }, 
+            "uci": [ "alpine-fan-control" ]
+        },
+        "write": {
+            "uci": [ "alpine-fan-control" ]
+        }
+    }
 }

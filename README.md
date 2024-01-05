@@ -1,5 +1,5 @@
 # openwrt-alpine-fan-control
-Control the fans on the Xiaomi R3D.
+Fan control daemon.
 
 ## Usage
 

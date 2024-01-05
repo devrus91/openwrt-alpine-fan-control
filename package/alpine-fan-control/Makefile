@@ -8,8 +8,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=alpine-fan-control
-PKG_VERSION:=1
-PKG_RELEASE:=1
+PKG_VERSION:=1.1
+PKG_RELEASE:=20240105
 PKG_LICENSE:=GPL-3.0
 
 PKG_MAINTAINER:=Kenneth Kasilag <kenneth@kasilag.me>
@@ -21,7 +21,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/alpine-fan-control
 	SECTION:=utils
 	CATEGORY:=Utilities
-	TITLE:=Fan control daemon for Xiaomi R3D
+	TITLE:=Fan control daemon
 	PKGARCH:=all
 endef
 
@@ -30,7 +30,7 @@ define Package/alpine-fan-control/conffiles
 endef
 
 define Package/alpine-fan-control/description
-  Fan control daemon for Xiaomi R3D
+  Fan control daemon
 endef
 
 define Build/Prepare

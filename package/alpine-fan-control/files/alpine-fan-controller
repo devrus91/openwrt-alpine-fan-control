@@ -19,6 +19,16 @@ LOGPREFIX="alpine-fan-controller"
 HYSTERESIS=0
 TEMP_AT_LAST_SPEED_CHANGE=0
 
+function log_error {
+	logger "$LOGPREFIX: $1"
+}
+
+function log_debug {
+	if [ $DEBUG -gt 0 ]; then
+		logger "$LOGPREFIX: $1"
+	fi
+}
+
 # checking for privileges
 if [ $UID -ne 0 ]; then
 	echo "Writing to sysfs requires privileges, relaunch as root"
@@ -27,22 +37,16 @@ fi
 
 # hwmon paths, hardcoded for Xiaomi R3D, adjust as needed
 FILE_SPEED=$( grep -l emc230 /sys/class/hwmon/hwmon*/name )
-[ -f "$FILE_SPEED" ] || { logger "$LOGPREFIX: fan controller EMC230x not found" ; exit 1; }
+[ -f "$FILE_SPEED" ] || { log_error "fan controller EMC230x not found" ; exit 1; }
 FILE_SPEED=$( dirname "$FILE_SPEED" 2>/dev/null )
 FILE_SPEED=$FILE_SPEED/pwm1
-[ -f "$FILE_SPEED" ] || { logger "$LOGPREFIX: Fan controller EMC230x not found" ; exit 1; }
+[ -f "$FILE_SPEED" ] || { log_error "Fan controller EMC230x not found" ; exit 1; }
 
 FILE_TEMP=$( grep -l tmp75 /sys/class/hwmon/hwmon*/name )
-[ -f "$FILE_TEMP" ] || { logger "$LOGPREFIX: thermal sensor TMP75 not found" ; exit 1; }
+[ -f "$FILE_TEMP" ] || { log_error "thermal sensor TMP75 not found" ; exit 1; }
 FILE_TEMP=$( dirname "$FILE_TEMP" 2>/dev/null )
 FILE_TEMP=$FILE_TEMP/temp1_input
-[ -f "$FILE_TEMP" ] || { logger "$LOGPREFIX: Thermal sensor TMP75 not found" ; exit 1; }
-
-function log_debug {
-	if [ $DEBUG -gt 0 ]; then
-		logger "$LOGPREFIX: $1"
-	fi
-}
+[ -f "$FILE_TEMP" ] || { log_error "Thermal sensor TMP75 not found" ; exit 1; }
 
 function get_speed {
 	local speed=$(cat $FILE_SPEED)
