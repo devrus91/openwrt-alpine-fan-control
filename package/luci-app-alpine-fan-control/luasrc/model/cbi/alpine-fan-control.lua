@@ -4,19 +4,73 @@
 
 local fs  = require "nixio.fs" 
 local sys = require "luci.sys"
-local m, s, p
+
+local m, s, p, ok
+local cur_temp, cur_speed
+
+local msg = translate("Service status:") .. " "
 
 local service_running = (luci.sys.call("pgrep -f \"/alpine-fan-controller\" > /dev/null"))==0
-
-local state_msg = " "
-
 if service_running then
-    state_msg="<span style=\"color:green;font-weight:bold\">" .. translate("Active")
+    msg = msg .. "<span style=\"color:green;font-weight:bold\">" .. translate("Active") .. "</span>"
 else
-    state_msg="<span style=\"color:red;font-weight:bold\">" .. translate("Inactive")  .. "</span>"
+    msg = msg .. "<span style=\"color:red;font-weight:bold\">" .. translate("Inactive") .. "</span>"
 end
 
-m = Map("alpine-fan-control", translate("Fan Control"),	translate("Service status: ") .. state_msg)
+msg = msg .. "<br /><br />" .. translate("Current temperature:") .. " "
+
+function get_cur_temp()
+	local FILE_TEMP
+	local uci = (require "luci.model.uci").cursor()
+	local tmp_sens = uci:get("alpine-fan-control", "@alpine-fan-control[0]", "tmp_sens") or ""
+	if tmp_sens ~= "" then
+		FILE_TEMP = luci.sys.exec("grep -l -F " .. tmp_sens .. " /sys/class/hwmon/hwmon*/name 2>/dev/null") or ""
+		if FILE_TEMP ~= "" then
+			FILE_TEMP = luci.sys.exec("dirname '" .. FILE_TEMP .. "' 2>/dev/null | xargs echo -n") or ""
+			FILE_TEMP = FILE_TEMP .. "/temp1_input"
+			local cur_temp = luci.sys.exec("cat " .. FILE_TEMP .. " 2>/dev/null") or ""
+			if cur_temp ~= "" then
+				cur_temp = tonumber(cur_temp)
+				cur_temp = cur_temp / 1000.0
+				return tostring(cur_temp)
+			end
+		end
+	end
+	return ""
+end
+ok, cur_temp = pcall(get_cur_temp)
+if ok and cur_temp ~= nil and cur_temp ~= "" then
+	msg = msg .. cur_temp .. " °C"
+end
+
+msg = msg .. "<br /><br />" .. translate("Current fan speed:") .. " "
+
+function get_cur_speed()
+	local FILE_SPEED
+	local uci = (require "luci.model.uci").cursor()
+	local drv_speed_max = uci:get("alpine-fan-control", "@alpine-fan-control[0]", "drv_speed_max") or "255"
+	local fan_cont = uci:get("alpine-fan-control", "@alpine-fan-control[0]", "fan_cont") or ""
+	if fan_cont ~= "" then
+		FILE_SPEED = luci.sys.exec("grep -l -F " .. fan_cont .. " /sys/class/hwmon/hwmon*/name 2>/dev/null") or ""
+		if FILE_SPEED ~= "" then
+			FILE_SPEED = luci.sys.exec("dirname '" .. FILE_SPEED .. "' 2>/dev/null | xargs echo -n") or ""
+			FILE_SPEED = FILE_SPEED .. "/pwm1"
+			local cur_speed = luci.sys.exec("cat " .. FILE_SPEED .. " 2>/dev/null") or ""
+			if cur_speed ~= "" then
+				cur_speed = tonumber(cur_speed)
+				drv_speed_max = tonumber(drv_speed_max)
+				return tostring(math.floor(cur_speed * 100.0 / drv_speed_max))
+			end
+		end
+	end
+	return ""
+end
+ok, cur_speed = pcall(get_cur_speed)
+if ok and cur_speed ~= nil and cur_speed ~= "" then
+	msg = msg .. cur_speed .. "%"
+end
+
+m = Map("alpine-fan-control", translate("Fan Control"),	msg)
 
 s = m:section(TypedSection, "alpine-fan-control", translate("Settings"))
 s.addremove = false
