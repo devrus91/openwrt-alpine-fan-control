@@ -97,15 +97,21 @@ function internal_set_speed {
 	echo $value > $FILE_SPEED
 }
 
+PREV_SET_SPEED=
+
 function set_speed {
 	local NEW_SPEED=$1
-	local CUR_SPEED=$( get_speed )
+	local interpolated=$2
+	local CUR_SPEED
 	local TEMP tmp
 
-	[ "$CUR_SPEED" = "$NEW_SPEED" ] && return
+	[ "$NEW_SPEED" = "$PREV_SET_SPEED" ] && return
+	
+	CUR_SPEED=$( get_speed )
 	log_debug "current speed: $CUR_SPEED, requested to set speed to $NEW_SPEED"
 
 	TEMP=$(cat $FILE_TEMP)
+	[ "$interpolated" = "1" ] && log_debug "interpolated speed value for temperature $TEMP is: $NEW_SPEED"
 	tmp=$TEMP_AT_LAST_SPEED_CHANGE
 	if [ -z "$tmp" ] || [ "$TEMP" -gt "$tmp" ] || [ $(( TEMP + HYSTERESIS )) -le "$tmp" ]; then
 		log_debug "current temp: $TEMP, temp at last change was $TEMP_AT_LAST_SPEED_CHANGE, changing speed to $NEW_SPEED"
@@ -114,6 +120,7 @@ function set_speed {
 	else
 		log_debug "not changing speed, we just did at $TEMP_AT_LAST_SPEED_CHANGE, next change when below $((TEMP_AT_LAST_SPEED_CHANGE - HYSTERESIS))"
 	fi
+	PREV_SET_SPEED=$NEW_SPEED
 }
 
 function set_speed_adv {
@@ -126,8 +133,7 @@ function set_speed_adv {
 	[ -z "$TEMP" ] && TEMP=$(cat $FILE_TEMP)
 	local value=$(( ( $TEMP - $LOWERTEMP ) * ( $HIGHERSPEED - $LOWERSPEED ) ))
 	local SPEED=$(( $value / ( $HIGHERTEMP - $LOWERTEMP ) + $LOWERSPEED ))
-	log_debug "interpolated speed value for temperature $TEMP is: $SPEED"
-	set_speed "$SPEED"
+	set_speed "$SPEED" 1
 }
 
 TEMP_PREV=
