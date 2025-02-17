@@ -20,7 +20,7 @@ define Package/luci-app-alpine-fan-control
 	SECTION:=luci
 	CATEGORY:=LuCI
 	SUBMENU:=3. Applications
-	DEPENDS:= +alpine-fan-control
+	DEPENDS:= +alpine-fan-control +luci-compat
 	TITLE:=luci-app-alpine-fan-control
 	PKGARCH:=all
 endef
