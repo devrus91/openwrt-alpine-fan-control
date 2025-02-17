@@ -31,7 +31,7 @@ SLEEP_INTERVAL=$( get_opt interval 5 )
 DEBUG=$( get_opt debug 0 )
 
 DRV_SPEED_MIN=$( get_opt drv_speed_min 0 )
-DRV_SPEED_MAX=$( get_opt drv_speed_max 255 )
+DRV_SPEED_MAX=$( get_opt drv_speed_max 180 )
 CFG_SPEED_MAX=100
 
 LOGPREFIX="alpine-fan-controller"
@@ -77,10 +77,10 @@ FILE_SPEED=$( dirname "$FILE_SPEED" 2>/dev/null )
 FILE_SPEED=$FILE_SPEED/pwm1
 [ -f "$FILE_SPEED" ] || { log_error "Fan controller $FAN_CONT not found" ; exit 1; }
 
-FILE_TEMP=$( grep -l -F $TEMP_SENSOR /sys/class/hwmon/hwmon*/name 2>/dev/null )
+FILE_TEMP=$( grep -l -F $TEMP_SENSOR /sys/class/thermal/thermal_zone*/type 2>/dev/null )
 [ -f "$FILE_TEMP" ] || { log_error "thermal sensor $TEMP_SENSOR not found" ; exit 1; }
 FILE_TEMP=$( dirname "$FILE_TEMP" 2>/dev/null )
-FILE_TEMP=$FILE_TEMP/temp1_input
+FILE_TEMP=$FILE_TEMP/temp
 [ -f "$FILE_TEMP" ] || { log_error "Thermal sensor $TEMP_SENSOR not found" ; exit 1; }
 
 function get_speed {

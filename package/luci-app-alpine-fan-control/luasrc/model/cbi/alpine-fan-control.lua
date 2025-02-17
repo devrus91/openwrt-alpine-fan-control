@@ -17,17 +17,17 @@ else
     msg = msg .. "<span style=\"color:red;font-weight:bold\">" .. translate("Inactive") .. "</span>"
 end
 
-msg = msg .. "<br /><br />" .. translate("Current temperature:") .. " "
+msg = msg .. "<br />" .. translate("Current temperature:") .. " "
 
 function get_cur_temp()
 	local FILE_TEMP
 	local uci = (require "luci.model.uci").cursor()
 	local tmp_sens = uci:get("alpine-fan-control", "@alpine-fan-control[0]", "tmp_sens") or ""
 	if tmp_sens ~= "" then
-		FILE_TEMP = luci.sys.exec("grep -l -F " .. tmp_sens .. " /sys/class/hwmon/hwmon*/name 2>/dev/null") or ""
+		FILE_TEMP = luci.sys.exec("grep -l -F " .. tmp_sens .. " /sys/class/thermal/thermal_zone*/type 2>/dev/null") or ""
 		if FILE_TEMP ~= "" then
 			FILE_TEMP = luci.sys.exec("dirname '" .. FILE_TEMP .. "' 2>/dev/null | xargs echo -n") or ""
-			FILE_TEMP = FILE_TEMP .. "/temp1_input"
+			FILE_TEMP = FILE_TEMP .. "/temp"
 			local cur_temp = luci.sys.exec("cat " .. FILE_TEMP .. " 2>/dev/null") or ""
 			if cur_temp ~= "" then
 				cur_temp = tonumber(cur_temp)
@@ -43,7 +43,7 @@ if ok and cur_temp ~= nil and cur_temp ~= "" then
 	msg = msg .. cur_temp .. " °C"
 end
 
-msg = msg .. "<br /><br />" .. translate("Current fan speed:") .. " "
+msg = msg .. "<br />" .. translate("Current fan speed:") .. " "
 
 function get_cur_speed()
 	local FILE_SPEED
@@ -70,6 +70,9 @@ if ok and cur_speed ~= nil and cur_speed ~= "" then
 	msg = msg .. cur_speed .. "%"
 end
 
+msg = msg .. "<br />" .. translate("Current fan RPM:") .. " "
+local rpm = luci.sys.exec("cat /sys/class/hwmon/hwmon*/fan1_input 2>/dev/null") or ""
+msg = msg .. rpm 
 m = Map("alpine-fan-control", translate("Fan Control"),	msg)
 
 s = m:section(TypedSection, "alpine-fan-control", translate("Settings"))
