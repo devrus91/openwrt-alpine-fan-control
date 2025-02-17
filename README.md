@@ -13,7 +13,7 @@ The fan control script borrows heavily from [amdgpu-fancontrol](https://github.c
 To build alpine-fan-control for OpenWrt, first add this feed to your ``feeds.conf`` in a fully set-up OpenWrt SDK [(read here on how to setup the OpenWrt SDK)](https://openwrt.org/docs/guide-developer/using_the_sdk):
 
 ```
-echo "src-git alpinefancontrol https://github.com/openwrt-xiaomi/openwrt-alpine-fan-control.git" >> feeds.conf
+echo "src-git alpinefancontrol https://github.com/devrus91/openwrt-alpine-fan-control.git" >> feeds.conf
 
 $ ./scripts/feeds update -a
 $ ./scripts/feeds install -a
