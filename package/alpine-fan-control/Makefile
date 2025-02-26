@@ -22,6 +22,7 @@ define Package/alpine-fan-control
 	SECTION:=utils
 	CATEGORY:=Utilities
 	TITLE:=Fan control daemon
+	DEPENDS:= +kmod-hwmon-core +kmod-thermal +kmod-regmap-i2c +kmod-i2c-core +kmod-regmap-core +kmod-hwmon-emc2305 +i2c-tools
 	PKGARCH:=all
 endef
 
